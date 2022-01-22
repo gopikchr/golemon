@@ -31,6 +31,7 @@ contributions.
 
 ## TODOs
 
+- [ ] Use the [embed](https://pkg.go.dev/embed) package to embed the template in the binary.
 - [ ] Create a github action that follows the rss feed for changes to
       `lemon.c` and `lempar.c` and and creates issues.
 - [ ] Figure out a better way to do constants: either put them in a
