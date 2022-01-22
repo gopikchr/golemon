@@ -36,3 +36,7 @@ contributions.
 - [ ] Figure out a better way to do constants: either put them in a
       separate file that is only (re)generated optionally, or make
       them settable with flags, or something.
+
+## Contributors
+
+- [@zellyn](https://github.com/zellyn)
