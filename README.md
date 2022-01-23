@@ -1,6 +1,6 @@
 # Go lemon port
 
-A port of the [lemon parser](https://www.sqlite.org/lemon.html) to Go.
+A port of the [Lemon Parser](https://www.sqlite.org/lemon.html) to Go.
 
 ## State
 
@@ -33,10 +33,14 @@ contributions.
 
 - [ ] Use the [embed](https://pkg.go.dev/embed) package to embed the template in the binary.
 - [ ] Create a github action that follows the rss feed for changes to
-      `lemon.c` and `lempar.c` and and creates issues.
-- [ ] Figure out a better way to do constants: either put them in a
-      separate file that is only (re)generated optionally, or make
-      them settable with flags, or something.
+      `lemon.c` and `lempar.c` and creates issues.  - [ ] Figure out a
+      better way to do constants: either put them in a separate file
+      that is only (re)generated optionally, or make them settable
+      with flags, or something.
+- [ ] Possibly, go back and incorporate the lessons learned from
+  porting `pikchr.y` to Go: use a `[]byte` to represent the main `char
+  *` pointers and pointer arithmetic, instead of converting to
+  `[]rune`.
 
 ## Contributors
 
