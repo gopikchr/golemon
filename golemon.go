@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -15,6 +16,7 @@ import (
 	"strings"
 	"unicode"
 	"unicode/utf8"
+	"embed"
 )
 
 /*
@@ -3268,9 +3270,12 @@ func tplt_skip_header(in *bufio.Reader, lineno *int) {
 	}
 }
 
+//go:embed lempar.go.tpl
+var efs embed.FS
+
 /* The next function finds the template file and opens it, returning
 ** a pointer to the opened file. */
-func tplt_open(lemp *lemon) *os.File {
+func tplt_open(lemp *lemon) fs.File {
 	templatename := "lempar.go.tpl"
 
 	/* first, see if user specified a template filename on the command line. */
@@ -3306,6 +3311,13 @@ func tplt_open(lemp *lemon) *os.File {
 		tpltname = templatename
 	} else {
 		tpltname = pathsearch(lemp.argv0, templatename, 0)
+	}
+	// If template name is still empty, read the template from the embeded filesystem
+	if tpltname == "" {
+		h, err := efs.Open(templatename)
+		if err == nil {
+		    return h
+		}
 	}
 	if tpltname == "" {
 		fmt.Fprintf(os.Stderr, "Can't find the parser driver template file \"%s\".\n",
