@@ -2650,6 +2650,9 @@ func Parse(gp *lemon) {
 		/* Skip C++ style comments */
 		if c == '/' && cp1 == '/' {
 			cp += 2
+			if filebuf[cp] == '/' {
+				cp++
+			}
 			for ; cp < len(filebuf) && filebuf[cp] != '\n'; cp++ {
 			}
 			continue
@@ -4481,7 +4484,6 @@ func ReportTable(lemp *lemon,
 	/* Generate a table containing the symbolic name of every symbol
 	 */
 	for i = 0; i < lemp.nsymbol; i++ {
-		// lemon_sprintf(line,"\"%s\",",lemp.symbols[i].name);
 		fmt.Fprintf(out, "  /* %4d */ \"%s\",\n", i, lemp.symbols[i].name)
 		lineno++
 	}
