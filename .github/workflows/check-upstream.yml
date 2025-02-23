@@ -1,0 +1,149 @@
+name: Check SQLite Upstream Changes
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs at 00:00 UTC every day
+  workflow_dispatch:  # Allows manual triggering
+    inputs:
+      dry_run:
+        description: 'Dry run (logs actions instead of creating issues)'
+        type: boolean
+        default: false
+      since_date:
+        description: 'Check for commits since this date (YYYY-MM-DD)'
+        type: string
+        required: false
+
+jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Create tracking directory
+        run: mkdir -p .github/tracking
+
+      - name: Check for new commits
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const { execSync } = require('child_process');
+
+            // Get dry run setting from workflow dispatch input, default to false
+            const isDryRun = process.env.GITHUB_EVENT_NAME === 'workflow_dispatch' &&
+              process.env.GITHUB_EVENT_PATH &&
+              JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')).inputs?.dry_run === 'true';
+
+            // Read the full timestamp from tracking file or use default date
+            const sinceDate = fs.existsSync('.github/tracking/last_commit.txt')
+              ? fs.readFileSync('.github/tracking/last_commit.txt', 'utf8').trim()
+              : '2022-12-07T00:00:00Z';
+
+            console.log(`Running in ${isDryRun ? 'dry run' : 'normal'} mode`);
+            console.log(`Checking for commits since: ${sinceDate}`);
+
+            // List of files that we're interested in
+            const targetFiles = ['tool/lemon.c', 'tool/lempar.c'];
+
+            // Function to fetch commits for a specific file since the last timestamp
+            async function getCommitsForFile(file, since) {
+              let allCommits = [];
+              let page = 1;
+              const sinceTime = new Date(since).getTime();
+
+              while (true) {
+                console.log(`Fetching page ${page} of commits for ${file}...`);
+                const { data: commits } = await github.rest.repos.listCommits({
+                  owner: 'sqlite',
+                  repo: 'sqlite',
+                  sha: 'master',
+                  path: file,
+                  per_page: 100,
+                  page: page
+                });
+
+                if (commits.length === 0) break;
+
+                // Filter commits that are newer than the 'since' timestamp
+                const newCommits = commits.filter(commit =>
+                  new Date(commit.commit.author.date).getTime() > sinceTime
+                );
+
+                allCommits = allCommits.concat(newCommits);
+
+                if (commits.length < 100) break;
+                page++;
+              }
+
+              return allCommits;
+            }
+
+            // Fetch commits for the two files
+            const lemonCommits = await getCommitsForFile('tool/lemon.c', sinceDate);
+            const lemparCommits = await getCommitsForFile('tool/lempar.c', sinceDate);
+
+            // Merge and sort the commits by date (ascending)
+            const allCommits = Array.from(
+              new Map([...lemonCommits, ...lemparCommits].map(commit => [commit.sha, commit])).values()
+            ).sort((a, b) =>
+              new Date(a.commit.author.date) - new Date(b.commit.author.date)
+            );
+
+            console.log(`Found ${allCommits.length} commits to examine`);
+
+            if (allCommits.length > 0) {
+              // Process each commit
+              for (const commit of allCommits) {
+                const issueTitle = `Port changes from upstream: ${commit.commit.message.split('\n')[0]}`;
+                const issueBody = [
+                  `New commit found in upstream SQLite repository that needs to be ported.`,
+                  ``,
+                  `Commit: ${commit.sha}`,
+                  `Author: ${commit.commit.author.name}`,
+                  `Date: ${commit.commit.author.date}`,
+                  ``,
+                  `Message:`,
+                  `${commit.commit.message}`,
+                  ``,
+                  `Original commit: https://github.com/sqlite/sqlite/commit/${commit.sha}`,
+                ].join('\n');
+
+                if (isDryRun) {
+                  console.log('\n--- Would create issue ---');
+                  console.log(`Title: ${issueTitle}`);
+                  console.log('Body:', issueBody);
+                  console.log('Labels: ["upstream-changes"]');
+                  console.log('------------------------\n');
+                } else {
+                  await github.rest.issues.create({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title: issueTitle,
+                    body: issueBody,
+                    labels: ['upstream-changes']
+                  });
+                }
+              }
+
+              // Store the full ISO timestamp of the most recent commit
+              const latestTimestamp = allCommits[allCommits.length - 1].commit.author.date;
+              if (isDryRun) {
+                console.log(`Would update last_commit.txt to: ${latestTimestamp}`);
+              } else {
+                fs.writeFileSync('.github/tracking/last_commit.txt', latestTimestamp);
+
+                // Commit and push the changes to the repository
+                execSync('git config --global user.name "github-actions"');
+                execSync('git config --global user.email "github-actions@users.noreply.github.com"');
+                execSync('git add .github/tracking/last_commit.txt');
+                execSync('git commit -m "Update last_commit.txt with the latest commit timestamp"');
+                execSync('git push');
+              }
+            } else {
+              console.log('No new commits found');
+            }
