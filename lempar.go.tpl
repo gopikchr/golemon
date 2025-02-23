@@ -1003,8 +1003,12 @@ func ParseFallback(iToken int) YYCODETYPE {
 
 // assert is used in various places in the generated and template code
 // to check invariants.
-func assert(condition bool, message string) {
+func assert(condition bool, message ...string) {
 	if !condition {
-		panic(message)
+		if len(message) > 0 {
+			panic(message[0])
+		} else {
+			panic("assert failed")
+		}
 	}
 }
