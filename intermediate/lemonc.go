@@ -249,7 +249,8 @@ type lemon struct {
 	printPreprocessed bool      /* Show preprocessor output on stdout */
 	has_fallback      bool      /* True if any %fallback is seen in the grammar */
 	nolinenosflag     bool      /* True if #line statements should not be printed */
-	argv0             string    /* Name of the program */
+	argc              int       /* Number of command-line arguments */
+	argv              []string  /* Command-line arguments */
 }
 
 /**************** From the file "table.h" *********************************/
@@ -1415,7 +1416,8 @@ func main() {
 	// Strsafe_init()
 	Symbol_init()
 	State_init()
-	lem.argv0 = os.Args[0]
+	lem.argv = os.Args
+	lem.argc = len(os.Args)
 	lem.filename = flag.Args()[0]
 	lem.basisflag = basisflag
 	lem.nolinenosflag = nolinenosflag
@@ -3322,7 +3324,7 @@ func tplt_open(lemp *lemon) *os.File {
 	} else if _, err := os.ReadFile(templatename); err == nil {
 		tpltname = templatename
 	} else {
-		tpltname = pathsearch(lemp.argv0, templatename, 0)
+		tpltname = pathsearch(lemp.argv0[0], templatename, 0)
 	}
 	if tpltname == "" {
 		fmt.Fprintf(os.Stderr, "Can't find the parser driver template file \"%s\".\n",
