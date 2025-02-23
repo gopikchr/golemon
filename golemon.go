@@ -3584,8 +3584,8 @@ func translate_code(lemp *lemon, rp *rule) int {
 			if i > 0 {
 				if rp.lhsalias != "" && rp.lhsalias == rp.rhsalias[i] {
 					ErrorMsg(lemp.filename, rp.ruleline,
-						"%s(%s) has the same label as the LHS but is not the left-most ",
-						"symbol on the RHS.",
+						"%s(%s) has the same label as the LHS but is not the left-most "+
+							"symbol on the RHS.",
 						rp.rhs[i].name, rp.rhsalias[i])
 					lemp.errorcnt++
 				}
@@ -5524,7 +5524,7 @@ func PrintState(lemp *lemon, sp *state) {
 		fmt.Printf(" %d.%d", sp.bp.rp.iRule, sp.bp.dot)
 	}
 	if sp.pDfltReduce != nil {
-		fmt.Printf(" %r", sp.pDfltReduce.iRule)
+		fmt.Printf(" %d", sp.pDfltReduce.iRule)
 	}
 	fmt.Printf("\n")
 	if sp.cfp != nil {
