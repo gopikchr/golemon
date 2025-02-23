@@ -241,6 +241,8 @@ type lemon struct {
 	filename          string    /* Name of the input file */
 	outname           string    /* Name of the current output file */
 	tokenprefix       string    /* A prefix added to token names in the .h file */
+	reallocFunc       string    /* Function to use to allocate stack space */
+	freeFunc          string    /* Function to use to free stack space */
 	nconflict         int       /* Number of parsing conflicts */
 	nactiontab        int       /* Number of entries in the yyaction[] table */
 	nlookaheadtab     int       /* Number of entries in yylookahead[] */
@@ -2147,6 +2149,12 @@ func parseonetoken(psp *pstate, runes []rune) {
 				psp.insertLineMacro = false
 			} else if x == "default_type" {
 				psp.declargslot = &(psp.gp.vartype)
+				psp.insertLineMacro = false
+			} else if x == "realloc" {
+				psp.declargslot = &(psp.gp.reallocFunc)
+				psp.insertLineMacro = false
+			} else if x == "free" {
+				psp.declargslot = &(psp.gp.freeFunc)
 				psp.insertLineMacro = false
 			} else if x == "stack_size" {
 				psp.declargslot = &(psp.gp.stacksize)
@@ -4106,6 +4114,27 @@ func ReportTable(lemp *lemon,
 		fmt.Fprintf(out, "#define %sARG_FETCH\n", name)
 		lineno++
 		fmt.Fprintf(out, "#define %sARG_STORE\n", name)
+		lineno++
+	}
+	if lemp.reallocFunc != "" {
+		fmt.Fprintf(out, "#define YYREALLOC %s\n", lemp.reallocFunc)
+		lineno++
+	} else {
+		fmt.Fprintf(out, "#define YYREALLOC realloc\n")
+		lineno++
+	}
+	if lemp.freeFunc != "" {
+		fmt.Fprintf(out, "#define YYFREE %s\n", lemp.freeFunc)
+		lineno++
+	} else {
+		fmt.Fprintf(out, "#define YYFREE free\n")
+		lineno++
+	}
+	if lemp.reallocFunc != "" && lemp.freeFunc != "" {
+		fmt.Fprintf(out, "#define YYDYNSTACK 1\n")
+		lineno++
+	} else {
+		fmt.Fprintf(out, "#define YYDYNSTACK 0\n")
 		lineno++
 	}
 	if lemp.ctx != "" {

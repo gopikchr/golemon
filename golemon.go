@@ -4069,10 +4069,27 @@ func ReportTable(lemp *lemon,
 	fmt.Fprintf(out, "const YYWILDCARD = %d\n", wildcard)
 	lineno++
 	if lemp.stacksize != "" {
-		fmt.Fprintf(out, "const YYSTACKDEPTH = %s\n", lemp.stacksize)
-		lineno++
+		if lemp.stacksize == "0" || strings.HasPrefix(lemp.stacksize, "-") {
+			fmt.Fprintf(out, "const YYSTACKDEPTH = 2\n")
+			lineno++
+			fmt.Fprintf(out, "const YYDYNSTACK = true\n")
+			lineno++
+			fmt.Fprintf(out, "const YYGROWABLESTACK = true\n")
+			lineno++
+		} else {
+			fmt.Fprintf(out, "const YYSTACKDEPTH = %s\n", lemp.stacksize)
+			lineno++
+			fmt.Fprintf(out, "const YYDYNSTACK = false\n")
+			lineno++
+			fmt.Fprintf(out, "const YYGROWABLESTACK = false\n")
+			lineno++
+		}
 	} else {
 		fmt.Fprintf(out, "const YYSTACKDEPTH = 100\n")
+		lineno++
+		fmt.Fprintf(out, "const YYDYNSTACK = false\n")
+		lineno++
+		fmt.Fprintf(out, "const YYGROWABLESTACK = false\n")
 		lineno++
 	}
 	fmt.Fprintf(out, "const YYNOERRORRECOVERY = false\n")
