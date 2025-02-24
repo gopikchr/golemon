@@ -4236,6 +4236,31 @@ func ReportTable(lemp *lemon,
 	fmt.Fprintf(out, "const YY_MAX_REDUCE = %d\n", i-1)
 	lineno++
 
+	/* Minimum and maximum token values that have a destructor */
+	var mn, mx int
+	for i := 0; i < lemp.nsymbol; i++ {
+		sp := lemp.symbols[i]
+
+		if sp != nil && sp.typ != TERMINAL && sp.destructor != "" {
+			if mn == 0 || sp.index < mn {
+				mn = sp.index
+			}
+			if sp.index > mx {
+				mx = sp.index
+			}
+		}
+	}
+	if lemp.tokendest != "" {
+		mn = 0
+	}
+	if lemp.vardest != "" {
+		mx = lemp.nsymbol - 1
+	}
+	fmt.Fprintf(out, "const YY_MIN_DSTRCTR = %d\n", mn)
+	lineno++
+	fmt.Fprintf(out, "const YY_MAX_DSTRCTR = %d\n", mx)
+	lineno++
+
 	tplt_xfer(lemp.name, in, out, &lineno)
 
 	/* Now output the action table and its associates:

@@ -91,6 +91,8 @@ import (
 **    YY_NO_ACTION       The yy_action[] code for no-op
 **    YY_MIN_REDUCE      Minimum value for reduce actions
 **    YY_MAX_REDUCE      Maximum value for reduce actions
+**    YY_MIN_DSTRCTR     Minimum symbol value that has a destructor
+**    YY_MAX_DSTRCTR     Maximum symbol value that has a destructor
  */
 /************* Begin control #defines *****************************************/
 %%
@@ -375,8 +377,21 @@ func (pParser *yyParser) yy_pop_parser_stack() {
 ** Clear all secondary memory allocations from the parser
  */
 func (pParser *yyParser) ParseFinalize() {
-	for pParser.yytos > 0 {
-		pParser.yy_pop_parser_stack()
+	/* In-lined version of calling yy_pop_parser_stack() for each
+	** element left in the stack */
+	yytos := pParser.yystack[pParser.yytos];
+	for pParser.yytos>0 {
+		if !NDEBUG {
+			if yyTraceFILE != nil {
+				fmt.Fprintf(yyTraceFILE,"%sPopping %s\n",
+				  yyTracePrompt,
+				  yyTokenName[yytos.major]);
+			}
+		}
+		if yytos.major>=YY_MIN_DSTRCTR && yytos.major<=YY_MAX_DSTRCTR {
+			pParser.yy_destructor(yytos.major, &yytos.minor);
+		}
+		pParser.yytos--;
 	}
 }
 
