@@ -103,3 +103,5 @@
     a preprocessor macro.
 
     FossilOrigin-Name: e2188a3edf3576963b45e9ffe6ef53e2a85aa68ea3dfb3243b4943d06ffaf829
+
+* Make equivalent changes. Allow `-U` to un-define a `-D` define.

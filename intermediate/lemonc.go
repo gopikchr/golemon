@@ -1303,6 +1303,7 @@ func ErrorMsg(filename string, lineno int, format string, args ...interface{}) {
  */
 
 var azDefine setFlag = make(map[string]bool)
+var azUndefine unsetFlag = unsetFlag{sf: azDefine}
 
 /* Rember the name of the output directory
  */
@@ -1383,6 +1384,7 @@ func main() {
 	flag.BoolVar(&compress, "c", false, "Don't compress the action table.")
 	flag.StringVar(&outputDir, "d", "", "Output directory.  Default '.'")
 	flag.Var(&azDefine, "D", "Define an %ifdef macro.")
+	flag.Var(&azDefine, "U", "Undefine a macro.")
 	flag.BoolVar(&printPP, "E", false, "Print input file after preprocessing.")
 	_ = flag.String("f", "", "Ignored.  (Placeholder for -f compiler options.)")
 	flag.BoolVar(&rpflag, "g", false, "Print grammar without actions.")
@@ -5485,6 +5487,19 @@ func (s setFlag) String() string {
 
 func (s setFlag) Set(value string) error {
 	s[value] = true
+	return nil
+}
+
+type unsetFlag struct {
+	sf setFlag
+}
+
+func (s unsetFlag) String() string {
+	return "[unset flag wrapper]"
+}
+
+func (us unsetFlag) Set(value string) error {
+	delete(us.sf, value)
 	return nil
 }
 
