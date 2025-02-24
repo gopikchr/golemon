@@ -66,7 +66,8 @@
 
     FossilOrigin-Name: ce009205a8edc02b7d45ac01bd0e692c3d2c3ffeadb68e4f1bad20c39075e692
 
-* TODO
+* This surprisingly didn't affect the Go version: it was all about
+  malloc, realloc, and free.
 
 ### commit 199f091a95
 
