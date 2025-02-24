@@ -57,7 +57,7 @@
 
     FossilOrigin-Name: e52c87420b072fa68d921eda66069542d50accbfaf1110ac4cc1543a4162200d
 
-* TODO
+* Changes are irrelevant to Go version
 
 ### commit 825596481f
 
