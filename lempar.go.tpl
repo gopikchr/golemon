@@ -388,7 +388,7 @@ func (pParser *yyParser) ParseFinalize() {
 				  yyTokenName[yytos.major]);
 			}
 		}
-		if yytos.major>=YY_MIN_DSTRCTR && yytos.major<=YY_MAX_DSTRCTR {
+		if yytos.major>=YY_MIN_DSTRCTR {
 			pParser.yy_destructor(yytos.major, &yytos.minor);
 		}
 		pParser.yytos--;

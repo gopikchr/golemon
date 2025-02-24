@@ -48,7 +48,8 @@
 
     FossilOrigin-Name: 2db8b30acdeaeaf7ec92dc0382a25f96bca4561fb68a72713ff963e27f39c63b
 
-*
+* Made equivalent changes
+* Ignored stack-resizing changes as irrelevant to the Go version
 
 ### commit 3ab9c021ff
 
@@ -56,7 +57,7 @@
 
     FossilOrigin-Name: e52c87420b072fa68d921eda66069542d50accbfaf1110ac4cc1543a4162200d
 
-*
+* TODO
 
 ### commit 825596481f
 
@@ -65,7 +66,7 @@
 
     FossilOrigin-Name: ce009205a8edc02b7d45ac01bd0e692c3d2c3ffeadb68e4f1bad20c39075e692
 
-*
+* TODO
 
 ### commit 199f091a95
 
@@ -75,7 +76,7 @@
 
     FossilOrigin-Name: eed76e6698eabe47c6bf9696599ce1c2f7aa428cf60f39d0566fbd0d1f6c4c62
 
-*
+* TODO
 
 ### commit 8cf7bd5448
 
@@ -84,7 +85,7 @@
 
     FossilOrigin-Name: 2aa009c38bb207ac59b9bbd6f8e0d7315697b3fd6a01f9431f29a3c7ccad53e7
 
-*
+* TODO
 
 ### commit 51b3b402c4
 
@@ -93,7 +94,7 @@
 
     FossilOrigin-Name: e54eb217c9508c19aee085b111a1323c9009f014ba4db6019918e27002c4ca8c
 
-*
+* TODO
 
 ### commit 543ee479eb
 
