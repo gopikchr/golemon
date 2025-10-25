@@ -1758,10 +1758,10 @@ func msort__action(list *action) *action {
 
 		i := 0
 		for ; i < LISTSIZE-1 && set[i] != nil; i++ {
-			ep = merge__action(ep, set[i])
+			ep = merge__action(set[i], ep)
 			set[i] = nil
 		}
-		set[i] = ep
+		set[i] = merge__action(set[i], ep)
 	}
 	ep = nil
 	i := 0
@@ -1783,10 +1783,10 @@ func msort__config(list *config) *config {
 
 		i := 0
 		for ; i < LISTSIZE-1 && set[i] != nil; i++ {
-			ep = merge__config(ep, set[i])
+			ep = merge__config(set[i], ep)
 			set[i] = nil
 		}
-		set[i] = ep
+		set[i] = merge__config(set[i], ep)
 	}
 	ep = nil
 	i := 0
@@ -1808,10 +1808,10 @@ func msort__config_basis(list *config) *config {
 
 		i := 0
 		for ; i < LISTSIZE-1 && set[i] != nil; i++ {
-			ep = merge__config_basis(ep, set[i])
+			ep = merge__config_basis(set[i], ep)
 			set[i] = nil
 		}
-		set[i] = ep
+		set[i] = merge__config_basis(set[i], ep)
 	}
 	ep = nil
 	i := 0
