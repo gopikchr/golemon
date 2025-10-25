@@ -5323,7 +5323,7 @@ func State_arrayof() []*state {
 /* Hash a configuration */
 func confighash(a *config) uint {
 	var h uint
-	h = h*571 + uint(a.rp.index)*37 + uint(a.dot)
+	h = uint(a.rp.index)*37 + uint(a.dot)
 	return h
 }
 
