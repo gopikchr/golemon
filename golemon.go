@@ -3200,7 +3200,7 @@ func compute_action(lemp *lemon, ap *action) int {
 	case SHIFT:
 		return ap.x.stp.statenum
 	case SHIFTREDUCE:
-		/* Since a SHIFT is inherient after a prior REDUCE, convert any
+		/* Since a SHIFT is inherent after a prior REDUCE, convert any
 		 ** SHIFTREDUCE action with a nonterminal on the LHS into a simple
 		 ** REDUCE action: */
 		if ap.sp.index >= lemp.nterminal && (lemp.errsym == nil || ap.sp.index != lemp.errsym.index) {
